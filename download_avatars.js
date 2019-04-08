@@ -1,10 +1,7 @@
 var request = require('request');
 var pw = require("./secrets");
 var fs = require('fs');
-
-console.log('Welcome to the GitHub Avatar Downloader!');
-
-
+var args = process.argv.slice(2);
 
 function getRepoContributors(repoOwner, repoName, cb) {
     var options = {
@@ -29,18 +26,18 @@ function downloadImageByURL(url, filePath) {
         .on('response', function (response) {                           
             console.log('Response Status Code: ', response.statusMessage);
             console.log('Response Headers:', response.headers['content-type']);
+            console.log('Download complete.');
         })
         .pipe(fs.createWriteStream(filePath));
 }    
 
-console.log('Download complete.');
     
-getRepoContributors("jquery", "jquery", function (err, result) {
-    console.log(result.length)
-    for (var i = 0; i < result.length; i++) {
-        downloadImageByURL(result[i].avatar_url, "./avatars/" + result[i].login + ".jpg");
+getRepoContributors(args[0], args[1], function (err, result) {
+    if (args[0] !== undefined && args[1] !== undefined) {
+        for (var i = 0; i < result.length; i++) {
+            downloadImageByURL(result[i].avatar_url, "./avatars/" + result[i].login + ".jpg");
+        }
+    } else {
+        console.log("Error: Please input value into both owner and repo");
     }
-    console.log("Errors:", err)
-})
-
-    
+});
